@@ -118,20 +118,23 @@
         let currentPage = 1;
         const perPage = 15;
         let totalPages = 1;
-        let sensorNumber = 1;
+        let sensorName = '';
 
-        function getSensorNumber() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('sensor') || 1;
+        function getSensorName() {
+            // const params = new URLSearchParams(window.location.search);
+            // return params.get('sensor') || 1;
+            const urlParams = new URLSearchParams(window.location.search);
+            const collectionName = urlParams.get('sensor') || 'temperature';
+            return collectionName;
         }
 
         async function fetchData() {
-            sensorNumber = getSensorNumber();
-            document.getElementById('sensorTitle').textContent = `Sensor ${sensorNumber} Details`;
-            document.title = `Sensor ${sensorNumber} Details`;
+            sensorName = getSensorName();
+            document.getElementById('sensorTitle').textContent = `Sensor ${sensorName} Details`;
+            document.title = `Sensor ${sensorName} Details`;
 
             try {
-                const records = await pb.collection(`test_sensor${sensorNumber}`).getList(currentPage, perPage, {
+                const records = await pb.collection(sensorName).getList(currentPage, perPage, {
                     sort: '-created'
                 });
 
@@ -166,7 +169,7 @@
 
                 // Fetch all records
                 while (true) {
-                    const records = await pb.collection(`test_sensor${sensorNumber}`).getList(page, 500, {
+                    const records = await pb.collection(sensorName).getList(page, 500, {
                         sort: 'created'
                     });
 
@@ -205,7 +208,7 @@
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `sensor${sensorNumber}_data.csv`;
+                link.download = `sensor_${sensorName}_data.csv`;
                 link.style.display = 'none';
                 document.body.appendChild(link);
                 link.click();
